@@ -1,6 +1,6 @@
 [
   {
-    "model": "home.column",
+    "model": "backend.column",
     "fields": {
       "name": "Hello World I'm the third none",
       "order": 1

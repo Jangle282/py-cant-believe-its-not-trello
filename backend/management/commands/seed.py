@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
-from home.factories.ColumnFactories import ColumnFactory
-from home.factories.CardFactories import CardFactory
-from home.models import Card, Column
+from backend.factories.ColumnFactories import ColumnFactory
+from backend.factories.CardFactories import CardFactory
+from backend.models import Card, Column
 
 
 class Command(BaseCommand):

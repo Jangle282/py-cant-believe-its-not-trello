@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=200)),
                 ('description', models.TextField()),
                 ('order', models.IntegerField(default=-1)),
-                ('column_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='home.column')),
+                ('column_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backend.column')),
             ],
         ),
     ]

@@ -1,6 +1,6 @@
 import factory
 import factory.django
-from home.models import Column
+from backend.models import Column
 
 
 class ColumnFactory(factory.django.DjangoModelFactory):

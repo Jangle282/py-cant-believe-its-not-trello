@@ -1,7 +1,7 @@
 import factory
 import factory.django
-from home.factories.ColumnFactories import ColumnFactory
-from home.models import Card, Column
+from backend.factories.ColumnFactories import ColumnFactory
+from backend.models import Card, Column
 
 
 class CardFactory(factory.django.DjangoModelFactory):
