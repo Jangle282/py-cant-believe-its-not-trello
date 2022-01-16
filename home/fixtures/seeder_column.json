@@ -1,0 +1,9 @@
+[
+  {
+    "model": "home.column",
+    "fields": {
+      "name": "Hello World I'm the third none",
+      "order": 1
+    }
+  }
+]
