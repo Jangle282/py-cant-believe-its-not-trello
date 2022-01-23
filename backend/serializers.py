@@ -7,6 +7,8 @@ class CardSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'column', 'order')
 
 class ColumnSerializer(serializers.ModelSerializer):
+    cards = CardSerializer(many=True, read_only=True)
+
     class Meta:
         model = Column
-        fields = ('id', 'name', 'order')
+        fields = ('id', 'name', 'order', 'cards')

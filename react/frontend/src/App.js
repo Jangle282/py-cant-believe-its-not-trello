@@ -1,24 +1,18 @@
 import React, {Component} from 'react'
 import {Trello} from './components/Trello.js'
-import './App.css';
-
+import './App.scss';
 
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      hello: "world"
-    }
+    this.state = {}
   }
 
 
   render() {
     return (
-      <div className="App">
-        App.js
-        <Trello></Trello>
-    </div> 
+      <Trello></Trello>
     )
   }
 }

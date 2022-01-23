@@ -1,0 +1,290 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+body {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Droid Sans,Helvetica Neue,sans-serif;
+    color: rgba(23,43,77);
+    font-size: 14px;
+    font-weight: 400;
+    margin: 0;
+}
+
+#root {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.pageContainer {
+    width: 100%;
+    background-image: url(https://trello-backgrounds.s3.amazonaws.com/SharedBackground/1280x1920/0a5c19cea1f4ece90061dec6c83b3618/photo-1597949449770-76dffc9dc9fe.jpg);
+    background-position-y: 50%;
+    background-size: cover;
+    overflow-x: auto;
+}
+
+.no-scroll {
+    overflow-x: hidden;
+}
+
+.mainContainer {
+    color: rgb(44, 44, 44);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.topbar {
+    padding: 10px 20px 10px;
+    background-color: rgba(0,0,0,.32);
+    color: white;
+}
+
+.topbar h4 {
+    margin: 0 0;
+    color: white
+}
+
+.board {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-x: auto;
+    height: 100%;
+    padding: 10px;
+}
+
+.column {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    width: 250px;
+    margin: 10px 4px;
+    padding: 4px 0 5px;
+    border-radius: 2px;
+    background-color: #dcdcdc;
+}
+
+.column-drop-zone {
+    height: 50vh;
+    background-color: grey;
+    opacity: 0.7;
+}
+
+.column-header {
+    background-color: #dcdcdc;
+    margin-bottom: 3px;
+    min-width: 0;
+    padding: 0 4px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+
+    .column-title-container {
+        flex-grow: 1;
+    }
+
+    h6 {
+        margin: 0;
+        padding: 5px 5px 5px 15px;
+    }
+
+    .edit-title-open {
+        border: 1px solid chartreuse;
+    }
+
+    .delete-button {
+        margin: 0 0;
+        display: inline-block;
+        cursor: pointer;
+        padding: 0 7px;
+        height: 1.5em;
+
+        &:hover {
+            background-color: dimgray;
+            border-radius: 2px;
+        }
+    }
+}
+
+.cardList {
+    max-height: 85vh;
+    overflow-y: auto;
+    margin-right: 2px;
+}
+
+.add-card-form {
+    padding: 5px 10px 5px 15px;
+}
+
+.card-container {
+    padding: 2px 14px 0 10px;
+
+    &:hover {
+        .ellipses {
+            background-color: lightgray;
+            display: inline-block;
+            text-align: center;
+            //margin: 4px 0;
+            border-radius: 2px;
+            width: 8%;
+            cursor: pointer;
+
+            &:hover {
+                background-color: dimgray;
+            }
+        }
+    }
+}
+
+.task-card {
+    color: rgb(48, 48, 48);
+    width: 100%;
+    padding: 6px 8px 2px;
+    background-color: #f6f6f6;
+    border-radius: 2px;
+    box-shadow: 0 1px 0 rgba(9, 30, 66, .25);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .card-name {
+        margin: 0 0;
+        width: 85%;
+        display: inline-block
+    }
+
+    .ellipses {
+        display: none;
+
+        .dots {
+            font-size: 11px
+        }
+    }
+
+}
+
+.card-detail-overlay {
+    background-color: rgba(9, 30, 66, .25);
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 20px
+}
+
+.edit-card {
+    background-color: #f2f2f2;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 2px;
+}
+
+.card-edit-title {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 15px;
+    h6 {
+        cursor: pointer;
+    }
+    input {
+        outline: none;
+        box-shadow: inset 0 0 0 2px #0079bf;
+        border: none;
+        background-color: white;
+        width: 100%;
+        padding-right: 10px;
+        margin-right: 10px;
+    }
+}
+
+.card-edit-description {
+    cursor: default;
+    textarea {
+        cursor: pointer;
+        outline: none;
+        border: none;
+        border-radius: 2px;
+        background-color: white;
+        resize: none;
+        padding: 10px;
+        width: 100%;
+        &:focus {
+            box-shadow: inset 0 0 0 2px #0079bf;
+            cursor: text;
+            height: 300px;
+        }
+    }
+}
+
+.card-edit-buttons {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    margin-top: 12px;
+    .btn {
+        border-radius: 4px;
+        margin: 5px;
+        padding: 10px;
+        cursor: pointer;
+        line-height: 1;
+        color: white;
+    }
+    .save-btn {
+        background-color: #5aac44;
+        &:hover {
+            background-color: #5aac44bd;
+        }
+        &:active {
+            background-color: #4d923a;
+        }
+    }
+    .delete-btn {
+        background-color: #cf513d;
+        &:hover {
+            background-color: #cf513da6;
+
+        }
+        &:active {
+            background-color: #a74030;
+        }
+    }
+}
+
+.dragged-placeholder {
+    background-color: rgb(48, 48, 48);
+    color: #f6f6f6;
+}
+
+
+.dragged-card {
+    background-color: rgb(48, 48, 48);
+    color: #f6f6f6;
+}
+
+.drag-zone {
+    height: 7px;
+
+    &.expand-drag-zone {
+        height: 50px;
+    }
+}
+
+.pointer-none {
+    pointer-events: none;
+}
