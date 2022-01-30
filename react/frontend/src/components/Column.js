@@ -6,14 +6,13 @@ export class Column extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      column: props.column,
+      newColumnTitle: props.column.name,
       showColDropZoneStyle: false,
       editTitleOpen: false
     }
     this.toggleEditTitle = this.toggleEditTitle.bind(this)
-    this.saveColTitle = this.saveColTitle.bind(this)
     this.keyUp = this.keyUp.bind(this)
-    this.onDelete = this.onDelete.bind(this)
+    this.handleColumnTitleChange = this.handleColumnTitleChange.bind(this)
   }
 
   toggleEditTitle() {
@@ -22,25 +21,24 @@ export class Column extends Component {
     }));
   }
 
-  saveColTitle() {
-    this.toggleEditTitle()
-    // send update column request
-  }
-
   keyUp(e) {
     if (e.keyCode === 13) {
-      this.saveColTitle()
+      this.toggleEditTitle()
+      this.props.onUpdate(this.props.column.id, {
+        name : this.state.newColumnTitle
+      })
     }
   }
 
-  onDelete() {
-    console.log("In column")
-    this.props.onDelete(this.state.column.id)
+  handleColumnTitleChange(e) {
+    e.preventDefault();
+    this.setState({
+      newColumnTitle : e.target.value
+    })
   }
 
-
   render() {
-    const Cards = this.state.column.cards.map((card) => <Card key={card.id} card={card}/>);
+    const Cards = this.props.column.cards.map((card) => <Card key={card.id} card={card}/>);
     
     return (
       <div className={this.state.showColDropZoneStyle ? 'column-drop-zone, column' : 'column'}
@@ -58,13 +56,17 @@ export class Column extends Component {
           <div className={this.state.colDragInProgress ? 'pointer-none, column-header' : 'column-header'}>
             { this.state.editTitleOpen 
               ? <div className="edit-title-open, column-title-container">
-                  <input v-model="column.name" onKeyUp={this.keyUp}/>
+                  <input 
+                    value={this.state.newColumnTitle} 
+                    onChange={(e) => this.handleColumnTitleChange(e)}
+                    onKeyUp={this.keyUp}
+                  />
                 </div>
               : <div onClick={this.toggleEditTitle} className="column-title-container">
-                  <h6>{ this.state.column.name || "add a column" }</h6>
+                  <h6>{ this.props.column.name || "add a column" }</h6>
                 </div>
             }
-            <div className="delete-button" onClick={() => this.onDelete()}>
+            <div className="delete-button" onClick={() => this.props.onDelete(this.state.column.id)}>
               <div>X</div>
             </div>
           </div>

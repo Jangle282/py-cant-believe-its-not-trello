@@ -25,11 +25,9 @@ export function store(name, order = -1) {
 }
 
 export function destroy(columnId) {
-    console.log("delete column", columnId)
     return axios
         .delete(`api/columns/${columnId}/`)
         .then(response => {
-            console.log(response)
             return response.data
         })
         .catch(err => {
@@ -37,16 +35,16 @@ export function destroy(columnId) {
         });
 }
 
-// export function update(context, payload) {
-//     axios
-//         .put(`/columns/${payload.id}`, payload)
-//         .then(() => {
-//             context.dispatch('retrieve')
-//         })
-//         .catch(err => {
-//             console.log("error updating column", err);
-//         });
-// }
+export function update(id, payload) {
+    return axios
+        .put(`api/columns/${id}/`, payload)
+        .then((response) => {
+            return response.data
+        })
+        .catch(err => {
+            console.log("error updating column", err);
+        });
+}
 
 // export function saveColumnOrder(context) {
 //     context.commit('SET_UPDATE_ORDER_PROGRESS', true)

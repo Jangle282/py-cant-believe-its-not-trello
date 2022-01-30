@@ -4,6 +4,7 @@ import {TopBar} from './TopBar'
 import {retrieve as retrieveColumns} from '../api/columns'
 import {store as storeColumn} from '../api/columns'
 import {destroy as deleteColumn} from '../api/columns'
+import {update as updateColumn} from '../api/columns'
 
 
 export class Trello extends Component {
@@ -17,13 +18,22 @@ export class Trello extends Component {
     }
     this.callStoreColumn = this.callStoreColumn.bind(this);
     this.callRetrieveColumns = this.callRetrieveColumns.bind(this);
+    this.callUpdateColumn = this.callUpdateColumn.bind(this);
+    this.callDeleteColumn = this.callDeleteColumn.bind(this);
+
     this.onStoreColumnKeyUp = this.onKeyUpStoreColumn.bind(this);
     this.toggleColForm = this.toggleColForm.bind(this);
-    this.handleColumnTitleChange = this.handleColumnTitleChange.bind(this);
+    this.handleNewColumnTitleChange = this.handleNewColumnTitleChange.bind(this);
   }
 
   componentDidMount() {
     this.callRetrieveColumns()
+  }
+
+  callStoreColumn() {
+    storeColumn(this.state.newColumnTitle)
+      .then(() => {this.callRetrieveColumns();})
+      .catch((e) => console.log("Error", e))
   }
 
   callRetrieveColumns() {
@@ -33,15 +43,17 @@ export class Trello extends Component {
     })
   }
   
-  callStoreColumn() {
-    storeColumn(this.state.newColumnTitle)
-      .then(() => {this.callRetrieveColumns();})
+  callUpdateColumn(id, payload) {
+    updateColumn(id, payload)
+      .then(() => {
+        this.callRetrieveColumns()
+      })
       .catch((e) => console.log("Error", e))
   }
 
   callDeleteColumn(colId) {
     deleteColumn(colId)
-    .then(() => {this.callRetrieveColumns();})
+    .then(() => {this.callRetrieveColumns()})
     .catch((e) => console.log("Error", e))
   }
 
@@ -52,7 +64,7 @@ export class Trello extends Component {
     }
   }
 
-  handleColumnTitleChange(e) {
+  handleNewColumnTitleChange(e) {
     this.setState({
       newColumnTitle : e.target.value
     })
@@ -71,7 +83,14 @@ export class Trello extends Component {
   }
 
   render() {
-    const Columns = this.state.columns.map((col) => <Column key={col.id} column={col} onDelete={(id) => this.callDeleteColumn(id)}/>);
+    const Columns = this.state.columns.map((col) => 
+      <Column 
+        key={col.id} 
+        column={col} 
+        onDelete={(id) => this.callDeleteColumn(id)}
+        onUpdate={(id, payload) => this.callUpdateColumn(id, payload)}
+      />
+    );
 
     const AddColumnForm =  
       <div className="addColForm">
@@ -80,7 +99,7 @@ export class Trello extends Component {
           type="text"
           name="title"
           id="title"
-          onChange={this.handleColumnTitleChange}
+          onChange={this.handleNewColumnTitleChange}
           onKeyUp={(e) => this.onKeyUpStoreColumn(e)}
         />
         <div onClick={this.callStoreColumn}>Add</div>
