@@ -2,7 +2,6 @@ import {Component} from 'react'
 import {Card} from './Card'
 
 
-
 export class Column extends Component {
   constructor(props) {
     super(props);
@@ -13,8 +12,8 @@ export class Column extends Component {
     }
     this.toggleEditTitle = this.toggleEditTitle.bind(this)
     this.saveColTitle = this.saveColTitle.bind(this)
-    this.deleteColumn = this.deleteColumn.bind(this)
     this.keyUp = this.keyUp.bind(this)
+    this.onDelete = this.onDelete.bind(this)
   }
 
   toggleEditTitle() {
@@ -28,14 +27,15 @@ export class Column extends Component {
     // send update column request
   }
 
-  deleteColumn() {
-    console.log('delete column ')
-  }
-
   keyUp(e) {
     if (e.keyCode === 13) {
       this.saveColTitle()
     }
+  }
+
+  onDelete() {
+    console.log("In column")
+    this.props.onDelete(this.state.column.id)
   }
 
 
@@ -64,7 +64,7 @@ export class Column extends Component {
                   <h6>{ this.state.column.name || "add a column" }</h6>
                 </div>
             }
-            <div className="delete-button" onClick={this.deleteColumn}>
+            <div className="delete-button" onClick={() => this.onDelete()}>
               <div>X</div>
             </div>
           </div>

@@ -3,6 +3,7 @@ import {Column} from './Column'
 import {TopBar} from './TopBar'
 import {retrieve as retrieveColumns} from '../api/columns'
 import {store as storeColumn} from '../api/columns'
+import {destroy as deleteColumn} from '../api/columns'
 
 
 export class Trello extends Component {
@@ -14,27 +15,40 @@ export class Trello extends Component {
       colFormOpen : false,
       newColumnTitle : ""
     }
+    this.callStoreColumn = this.callStoreColumn.bind(this);
+    this.callRetrieveColumns = this.callRetrieveColumns.bind(this);
     this.onStoreColumnKeyUp = this.onKeyUpStoreColumn.bind(this);
-    this.addColumnCall = this.addColumnCall.bind(this);
     this.toggleColForm = this.toggleColForm.bind(this);
     this.handleColumnTitleChange = this.handleColumnTitleChange.bind(this);
   }
 
   componentDidMount() {
+    this.callRetrieveColumns()
+  }
+
+  callRetrieveColumns() {
     retrieveColumns().then((rawColumns) => {
       const columns = this.orderColumns(rawColumns)
       this.setState({columns})
     })
   }
   
-  addColumnCall() {
+  callStoreColumn() {
     storeColumn(this.state.newColumnTitle)
+      .then(() => {this.callRetrieveColumns();})
+      .catch((e) => console.log("Error", e))
+  }
+
+  callDeleteColumn(colId) {
+    deleteColumn(colId)
+    .then(() => {this.callRetrieveColumns();})
+    .catch((e) => console.log("Error", e))
   }
 
   onKeyUpStoreColumn(e) {
     e.preventDefault()
     if (e.keyCode === 13) {
-      this.addColumnCall()
+      this.callStoreColumn()
     }
   }
 
@@ -57,7 +71,7 @@ export class Trello extends Component {
   }
 
   render() {
-    const Columns = this.state.columns.map((col) => <Column key={col.id} column={col}/>);
+    const Columns = this.state.columns.map((col) => <Column key={col.id} column={col} onDelete={(id) => this.callDeleteColumn(id)}/>);
 
     const AddColumnForm =  
       <div className="addColForm">
@@ -69,7 +83,7 @@ export class Trello extends Component {
           onChange={this.handleColumnTitleChange}
           onKeyUp={(e) => this.onKeyUpStoreColumn(e)}
         />
-        <div onClick={this.addColumnCall}>Add</div>
+        <div onClick={this.callStoreColumn}>Add</div>
         <div onClick={this.toggleColForm}>X</div>
       </div>
     const AddColumn = 

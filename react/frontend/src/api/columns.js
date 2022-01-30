@@ -14,26 +14,28 @@ export function retrieve() {
 
 export function store(name, order = -1) {
     const column = ({name, order})
-    axios
+    return axios
         .post("api/columns/", column)
         .then((response) => {
-            return response.data
+            return response.status
         })
         .catch(error => {
             console.log("error when creating new column", error);
         });
 }
 
-// export function destroy(context, payload) {
-//     axios
-//         .delete(`/columns/${payload}`)
-//         .then(response => {
-//             context.commit('REMOVE_COLUMN', payload)
-//         })
-//         .catch(err => {
-//             console.log("error deleting column", err);
-//         });
-// }
+export function destroy(columnId) {
+    console.log("delete column", columnId)
+    return axios
+        .delete(`api/columns/${columnId}/`)
+        .then(response => {
+            console.log(response)
+            return response.data
+        })
+        .catch(err => {
+            console.log("error deleting column", err);
+        });
+}
 
 // export function update(context, payload) {
 //     axios
