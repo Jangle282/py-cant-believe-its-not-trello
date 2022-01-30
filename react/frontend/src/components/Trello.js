@@ -2,6 +2,7 @@ import {Component} from 'react'
 import {Column} from './Column'
 import {TopBar} from './TopBar'
 import {retrieve as retrieveColumns} from '../api/columns'
+import {store as storeColumn} from '../api/columns'
 
 
 export class Trello extends Component {
@@ -9,8 +10,14 @@ export class Trello extends Component {
     super(props);
     this.state = {
       cardEditOverlayStatus: false,
-      columns: []
+      columns: [],
+      colFormOpen : false,
+      newColumnTitle : ""
     }
+    this.onStoreColumnKeyUp = this.onKeyUpStoreColumn.bind(this);
+    this.addColumnCall = this.addColumnCall.bind(this);
+    this.toggleColForm = this.toggleColForm.bind(this);
+    this.handleColumnTitleChange = this.handleColumnTitleChange.bind(this);
   }
 
   componentDidMount() {
@@ -19,15 +26,58 @@ export class Trello extends Component {
       this.setState({columns})
     })
   }
+  
+  addColumnCall() {
+    storeColumn(this.state.newColumnTitle)
+  }
+
+  onKeyUpStoreColumn(e) {
+    e.preventDefault()
+    if (e.keyCode === 13) {
+      this.addColumnCall()
+    }
+  }
+
+  handleColumnTitleChange(e) {
+    this.setState({
+      newColumnTitle : e.target.value
+    })
+  }
+
+  toggleColForm() {
+    this.setState(prevState => ({
+      colFormOpen: !prevState.colFormOpen
+    }));
+  }
 
   orderColumns(rawColumns) {
     return rawColumns.sort((a, b) => {
-      return a.order - b.order;
+      return b.order - a.order;
     });
   }
 
   render() {
     const Columns = this.state.columns.map((col) => <Column key={col.id} column={col}/>);
+
+    const AddColumnForm =  
+      <div className="addColForm">
+        <input
+          value={this.state.newColumnTitle}
+          type="text"
+          name="title"
+          id="title"
+          onChange={this.handleColumnTitleChange}
+          onKeyUp={(e) => this.onKeyUpStoreColumn(e)}
+        />
+        <div onClick={this.addColumnCall}>Add</div>
+        <div onClick={this.toggleColForm}>X</div>
+      </div>
+    const AddColumn = 
+      <div className="column-header">
+        <div onClick={this.toggleColForm} className="column-title-container">
+        <h6>Add a Column</h6>
+        </div>
+      </div>
 
     return (
       <div className={this.state.cardEditOverlayStatus ? 'no-scroll, pageContainer' : 'pageContainer'}>
@@ -35,25 +85,9 @@ export class Trello extends Component {
         <div className="mainContainer">
           <div className="board">
             {Columns}
-            {/* <div class="column">
-              <div v-if="colFormOpen" class="addColForm">
-                <input
-                  v-model="newColData.name"
-                  type="text"
-                  name="title"
-                  id="title"
-                  ref="colTitle"
-                // @keyup.enter="storeColumn"
-                />
-                <div onClick="storeColumn">Add</div>
-                <div onClick="toggleColForm">X</div>
-              </div>
-              <div v-else class="column-header">
-                <div onClick="toggleColForm" class="column-title-container">
-                  <h6>Add a Column</h6>
-                </div>
-              </div>
-            </div> */}
+            <div className="column">
+              {this.state.colFormOpen ? AddColumnForm : AddColumn}
+            </div>
           </div>
         </div>
       {/* <div v-if="cardEditOverlayStatus" class="card-detail-overlay" @click.stop="closeEditCardOverlay">

@@ -12,16 +12,17 @@ export function retrieve() {
         });
 }
 
-// export function store(context, payload) {
-//     axios
-//         .post("/columns", payload)
-//         .then(() => {
-//             context.dispatch('retrieve')
-//         })
-//         .catch(error => {
-//             console.log("error when creating new column", error);
-//         });
-// }
+export function store(name, order = -1) {
+    const column = ({name, order})
+    axios
+        .post("api/columns/", column)
+        .then((response) => {
+            return response.data
+        })
+        .catch(error => {
+            console.log("error when creating new column", error);
+        });
+}
 
 // export function destroy(context, payload) {
 //     axios
