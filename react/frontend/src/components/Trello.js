@@ -11,10 +11,10 @@ export class Trello extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cardEditOverlayStatus: false,
       columns: [],
       colFormOpen : false,
-      newColumnTitle : ""
+      newColumnTitle : "",
+      cardEditOverlayStatus: false,
     }
     this.callStoreColumn = this.callStoreColumn.bind(this);
     this.callRetrieveColumns = this.callRetrieveColumns.bind(this);
@@ -38,24 +38,24 @@ export class Trello extends Component {
   }
 
   callRetrieveColumns() {
-    retrieveColumns().then((rawColumns) => {
-      const columns = this.orderColumns(rawColumns)
-      this.setState({columns})
-    })
+    retrieveColumns()
+      .then((rawColumns) => {
+        const columns = this.orderColumns(rawColumns)
+        this.setState({columns})
+      })
+      .catch((e) => console.log("Error", e))
   }
   
   callUpdateColumn(id, payload) {
     updateColumn(id, payload)
-      .then(() => {
-        this.callRetrieveColumns()
-      })
+      .then(() => {this.callRetrieveColumns()})
       .catch((e) => console.log("Error", e))
   }
 
   callDeleteColumn(colId) {
     deleteColumn(colId)
-    .then(() => {this.callRetrieveColumns()})
-    .catch((e) => console.log("Error", e))
+      .then(() => {this.callRetrieveColumns()})
+      .catch((e) => console.log("Error", e))
   }
 
   onKeyUpStoreColumn(e) {
@@ -73,7 +73,8 @@ export class Trello extends Component {
 
   toggleColForm() {
     this.setState(prevState => ({
-      colFormOpen: !prevState.colFormOpen
+      colFormOpen: !prevState.colFormOpen,
+      newColumnTitle : ""
     }));
   }
 
