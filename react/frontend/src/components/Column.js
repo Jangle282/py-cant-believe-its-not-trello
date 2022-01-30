@@ -33,9 +33,9 @@ export class Column extends Component {
   }
 
   keyUp(e) {
-    // e.preventDefault()
-    this.saveColTitle()
-    // close and send save event
+    if (e.keyCode === 13) {
+      this.saveColTitle()
+    }
   }
 
 
