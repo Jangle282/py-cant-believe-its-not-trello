@@ -31,6 +31,7 @@ export class Trello extends Component {
   }
 
   callStoreColumn() {
+    this.setState({newColumnTitle : ""})
     storeColumn(this.state.newColumnTitle)
       .then(() => {this.callRetrieveColumns();})
       .catch((e) => console.log("Error", e))

@@ -66,7 +66,7 @@ export class Column extends Component {
                   <h6>{ this.props.column.name || "add a column" }</h6>
                 </div>
             }
-            <div className="delete-button" onClick={() => this.props.onDelete(this.state.column.id)}>
+            <div className="delete-button" onClick={() => this.props.onDelete(this.props.column.id)}>
               <div>X</div>
             </div>
           </div>
