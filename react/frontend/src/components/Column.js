@@ -1,5 +1,7 @@
 import {Component} from 'react'
 import {Card} from './Card'
+import {ColumnHeader} from './Functional/ColumnHeader'
+import { EditColumnForm } from './Functional/EditColumnForm copy';
 
 
 export class Column extends Component {
@@ -38,6 +40,17 @@ export class Column extends Component {
   }
 
   render() {
+    const ColHeader = <ColumnHeader
+      text={this.props.column.name} 
+      onToggle={this.toggleEditTitle}
+    />
+    
+    const EditCol = <EditColumnForm
+      title={this.state.newColumnTitle}
+      onChange={(e) => this.handleColumnTitleChange(e)}
+      onKeyUp={(e) => this.keyUp(e)}
+    />
+
     const Cards = this.props.column.cards.map((card) => <Card key={card.id} card={card}/>);
     
     return (
@@ -52,20 +65,8 @@ export class Column extends Component {
       >
         { !this.state.showColDropZoneStyle && 
         <div>
-          {/* TODO make func component for title fields */}
           <div className={this.state.colDragInProgress ? 'pointer-none, column-header' : 'column-header'}>
-            { this.state.editTitleOpen 
-              ? <div className="edit-title-open, column-title-container">
-                  <input 
-                    value={this.state.newColumnTitle} 
-                    onChange={(e) => this.handleColumnTitleChange(e)}
-                    onKeyUp={this.keyUp}
-                  />
-                </div>
-              : <div onClick={this.toggleEditTitle} className="column-title-container">
-                  <h6>{ this.props.column.name || "add a column" }</h6>
-                </div>
-            }
+            { this.state.editTitleOpen ? EditCol : ColHeader }
             <div className="delete-button" onClick={() => this.props.onDelete(this.props.column.id)}>
               <div>X</div>
             </div>
