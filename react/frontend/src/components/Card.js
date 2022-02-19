@@ -8,7 +8,6 @@ export class Card extends Component {
       card: props.card,
       openEditCardOverlay: false
     }
-    // this.openEditCardOverlay = this.openEditCardOverlay.bind(this)
   }
 
   openEditCardModal() {
@@ -26,7 +25,7 @@ export class Card extends Component {
           // @dragend="cardDragEnded"
           className={draggedCard ? 'dragged-card' : 'task-card'}
           id="task-card"
-          // @click="openEditCardOverlay"
+          onClick={() => this.openEditCardModal()}
         >
           <p className="card-name">{this.state.card.name}</p>
 
