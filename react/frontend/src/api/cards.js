@@ -1,35 +1,37 @@
-// export function store(context, payload) {
-//     axios
-//         .post("/cards", payload)
-//         .then(response => {
-//             context.dispatch('column/retrieve',  null, {root:true})
-//         })
-//         .catch(error => {
-//             console.log("error storing card", error);
-//         });
-// }
+import axios from 'axios';
 
-// export function destroy(context, payload) {
-//     axios
-//         .delete(`/cards/${payload}`)
-//         .then(() => {
-//             context.dispatch('column/retrieve',  null, {root:true})
-//         })
-//         .catch(err => {
-//             console.log("error deleting card", err);
-//         });
-// }
+export function store(payload) {
+    return axios
+        .post("/api/cards/", payload)
+        .then(response => {
+            return response.data
+        })
+        .catch(error => {
+            console.log("error storing card", error);
+        });
+}
 
-// export function update(context, payload) {
-//     axios
-//         .put(`cards/${payload.id}`, payload)
-//         .then(response => {
-//             context.dispatch('column/retrieve',  null, {root:true})
-//         })
-//         .catch(err => {
-//             console.log("error updating card", err);
-//         });
-// }
+export function destroy(cardId) {
+    return axios
+        .delete(`api/cards/${cardId}/`)
+        .then((response) => {
+            return response.data
+        })
+        .catch(err => {
+            console.log("error deleting card", err);
+        });
+}
+
+export function update(card) {
+    return axios
+        .put(`api/cards/${card.id}/`, card)
+        .then((response) => {
+            return response.data
+        })
+        .catch(err => {
+            console.log("error updating card", err);
+        });
+}
 
 // export function storeNewCardOrder(context, payload) {
 //     let data = [];

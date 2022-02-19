@@ -8,13 +8,12 @@ export class Card extends Component {
       card: props.card,
       openEditCardOverlay: false
     }
-    this.openEditCardOverlay = this.openEditCardOverlay.bind(this)
+    // this.openEditCardOverlay = this.openEditCardOverlay.bind(this)
   }
 
-  openEditCardOverlay() {
-    console.log('open edit card overlay')
+  openEditCardModal() {
+    this.props.openEditCardModal(this.props.card)
   }
-
 
   render() {
     const expandDragZone = false; // dragTargetId === card.id && cardIsOverTarget
@@ -31,7 +30,7 @@ export class Card extends Component {
         >
           <p className="card-name">{this.state.card.name}</p>
 
-          <div className="ellipses" onClick={this.openEditCardOverlay}>
+          <div className="ellipses" onClick={() => this.openEditCardModal()}>
             <div className="dots">...</div>
           </div>
         </div>
