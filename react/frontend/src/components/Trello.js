@@ -1,39 +1,38 @@
-import {Component} from 'react'
-import {Column} from './Column'
-import {TopBar} from './TopBar'
+import { Component } from 'react'
+import { Column } from './Column'
+import { TopBar } from './TopBar'
+import { AddColumnForm } from './Functional/AddColumnForm'
+import { ColumnHeader } from './Functional/ColumnHeader'
+import { EditCardForm } from './Functional/EditCardForm'
 import {
-  retrieve as retrieveColumns, 
+  retrieve as retrieveColumns,
   store as storeColumn,
   destroy as deleteColumn,
   update as updateColumn
 } from '../api/columns'
-import { 
+import {
   update as updateCard,
   destroy as deleteCard
 } from '../api/cards'
-import {AddColumnForm} from './Functional/AddColumnForm'
-import {ColumnHeader} from './Functional/ColumnHeader'
-
 
 export class Trello extends Component {
   constructor(props) {
     super(props);
     this.state = {
       columns: [],
-      colFormOpen : false,
-      newColumnTitle : "",
+      colFormOpen: false,
+      newColumnTitle: "",
       editCardOverlayStatus: false,
-      editCardTitle : false,
+      editCardTitle: false,
       editedCard: {
         name: "",
-        description : ''
+        description: ''
       }
     }
     this.callStoreColumn = this.callStoreColumn.bind(this);
     this.callRetrieveColumns = this.callRetrieveColumns.bind(this);
     this.callUpdateColumn = this.callUpdateColumn.bind(this);
     this.callDeleteColumn = this.callDeleteColumn.bind(this);
-
     this.onStoreColumnKeyUp = this.onKeyUpStoreColumn.bind(this);
     this.toggleColForm = this.toggleColForm.bind(this);
     this.handleNewColumnTitleChange = this.handleNewColumnTitleChange.bind(this);
@@ -46,9 +45,9 @@ export class Trello extends Component {
 
   // Api calls - columns
   callStoreColumn() {
-    this.setState({newColumnTitle : ""})
+    this.setState({ newColumnTitle: "" })
     storeColumn(this.state.newColumnTitle)
-      .then(() => {this.callRetrieveColumns();})
+      .then(() => { this.callRetrieveColumns(); })
       .catch((e) => console.log("Error", e))
   }
 
@@ -56,40 +55,40 @@ export class Trello extends Component {
     retrieveColumns()
       .then((rawColumns) => {
         const columns = this.orderColumns(rawColumns)
-        this.setState({columns})
+        this.setState({ columns })
       })
       .catch((e) => console.log("Error", e))
   }
-  
+
   callUpdateColumn(id, payload) {
     updateColumn(id, payload)
-      .then(() => {this.callRetrieveColumns()})
+      .then(() => { this.callRetrieveColumns() })
       .catch((e) => console.log("Error", e))
   }
 
   callDeleteColumn(colId) {
     deleteColumn(colId)
-      .then(() => {this.callRetrieveColumns()})
+      .then(() => { this.callRetrieveColumns() })
       .catch((e) => console.log("Error", e))
   }
 
   // Api calls - Cards
   callUpdateCard() {
     updateCard(this.state.editedCard)
-    .then((response => {
-      this.callRetrieveColumns()
-      this.closeEditCardModal()
-    }))
-    .catch((error) => {console.log("error", error)})
+      .then((response => {
+        this.callRetrieveColumns()
+        this.closeEditCardModal()
+      }))
+      .catch((error) => { console.log("error", error) })
   }
 
   callDeleteCard() {
     deleteCard(this.state.editedCard.id)
-    .then((response => {
-      this.callRetrieveColumns()
-      this.closeEditCardModal()
-    }))
-    .catch((error) => {console.log("error", error)})
+      .then((response => {
+        this.callRetrieveColumns()
+        this.closeEditCardModal()
+      }))
+      .catch((error) => { console.log("error", error) })
   }
 
   // Key up actions
@@ -103,17 +102,17 @@ export class Trello extends Component {
   // Handlechange methods
   handleNewColumnTitleChange(e) {
     this.setState({
-      newColumnTitle : e.target.value
+      newColumnTitle: e.target.value
     })
   }
 
   handleEditCardDescription(e) {
-    const newState = {...this.state.editedCard, description: e.target.value}
+    const newState = { ...this.state.editedCard, description: e.target.value }
     this.setState({ editedCard: newState })
   }
 
   handleEditCardTitle(e) {
-    const newState = {...this.state.editedCard, name: e.target.value}
+    const newState = { ...this.state.editedCard, name: e.target.value }
     this.setState({ editedCard: newState })
   }
 
@@ -121,7 +120,7 @@ export class Trello extends Component {
   toggleColForm() {
     this.setState(prevState => ({
       colFormOpen: !prevState.colFormOpen,
-      newColumnTitle : ""
+      newColumnTitle: ""
     }));
   }
 
@@ -133,14 +132,14 @@ export class Trello extends Component {
 
   openEditCardModal(card) {
     this.setState({
-      editCardOverlayStatus : true,
-      editedCard : card
+      editCardOverlayStatus: true,
+      editedCard: card
     })
   }
 
   closeEditCardModal() {
     this.setState({
-      editCardOverlayStatus : false,
+      editCardOverlayStatus: false,
     })
   }
 
@@ -150,35 +149,46 @@ export class Trello extends Component {
       return b.order - a.order;
     });
   }
- 
+
   render() {
-    const columns = this.state.columns.map((col) => <Column 
-        key={col.id} 
-        column={col} 
-        onDelete={(id) => this.callDeleteColumn(id)}
-        onUpdate={(id, payload) => this.callUpdateColumn(id, payload)}
-        openEditCardModal={(card) => this.openEditCardModal(card)}
-        refreshColumns={() => this.callRetrieveColumns()}
-      />
+    const columns = this.state.columns.map((col) => <Column
+      key={col.id}
+      column={col}
+      onDelete={(id) => this.callDeleteColumn(id)}
+      onUpdate={(id, payload) => this.callUpdateColumn(id, payload)}
+      openEditCardModal={(card) => this.openEditCardModal(card)}
+      refreshColumns={() => this.callRetrieveColumns()}
+    />
     );
 
-    const addColumnForm = <AddColumnForm 
-        newColumnTitle={this.state.newColumnTitle} 
-        onChange={(e) => this.handleNewColumnTitleChange(e)}
-        storeWithEnter={(e) => this.onKeyUpStoreColumn(e)}
-        storeWithButton={this.callStoreColumn}
-        closeEdit={this.toggleColForm}
-      />
-      
-    const columnHeader = <ColumnHeader 
+    const addColumnForm = <AddColumnForm
+      newColumnTitle={this.state.newColumnTitle}
+      onChange={(e) => this.handleNewColumnTitleChange(e)}
+      storeWithEnter={(e) => this.onKeyUpStoreColumn(e)}
+      storeWithButton={this.callStoreColumn}
+      closeEdit={this.toggleColForm}
+    />
+
+    const columnHeader = <ColumnHeader
       text="Add a column"
       onToggle={this.toggleColForm}
-      />
+    />
 
     const editCardDetailTitle = <input
       placeholder={this.state.editedCard.name}
       value={this.state.editedCard.name}
       onChange={(e) => this.handleEditCardTitle(e)}
+    />
+
+    const editCardForm = <EditCardForm
+      toggleEditCardTitle={(e) => this.toggleEditCardTitle(e)}
+      title={this.state.editCardTitle}
+      editCardDetailTitle={editCardDetailTitle}
+      card={this.state.editedCard}
+      closeEditCardModal={(e) => this.closeEditCardModal(e)}
+      handleEditCardDescription={(e) => this.handleEditCardDescription(e)}
+      callUpdateCard={() => this.callUpdateCard()}
+      callDeleteCard={() => this.callDeleteCard()}
     />
 
     return (
@@ -192,28 +202,7 @@ export class Trello extends Component {
             </div>
           </div>
         </div>
-        { this.state.editCardOverlayStatus && 
-        <div className="card-detail-overlay">
-          <div className="edit-card" onClick={(e) => this.toggleEditCardTitle(e)}>
-            <div className="card-edit-title">
-              { this.state.editCardTitle ? editCardDetailTitle : <h6 onClick={(e) => this.toggleEditCardTitle(e)}>{this.state.editedCard.name}</h6>}
-              <span className="" onClick={(e) => this.closeEditCardModal(e)}>X</span>
-            </div>
-            <div className="card-edit-description">
-                <h6>Description</h6>
-                <textarea
-                    value={this.state.editedCard.description}
-                    placeholder="Give a more detailed description..."
-                    onChange={(e) => this.handleEditCardDescription(e)}
-                />
-            </div>
-            <div className="card-edit-buttons">
-                <div onClick={() => this.callUpdateCard()} className="btn save-btn">Save</div>
-                <div onClick={() => this.callDeleteCard()} className="btn delete-btn">Delete</div>
-            </div>
-          </div>
-        </div>
-        }
+        {this.state.editCardOverlayStatus && editCardForm}
       </div>
     )
   }

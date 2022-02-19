@@ -143,7 +143,6 @@ export class Column extends Component {
           <div className={this.state.colDragInProgress ? 'pointer-none, cardList' : 'cardList'}>
             {cards}
           </div>
-
           {this.state.newCardFormOpen ?  addCardForm : addCard}
         </div>
         }
