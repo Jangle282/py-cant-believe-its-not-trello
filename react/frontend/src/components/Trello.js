@@ -8,7 +8,9 @@ import {
   retrieve as retrieveColumns,
   store as storeColumn,
   destroy as deleteColumn,
-  update as updateColumn
+  update as updateColumn,
+  saveColumnOrder
+
 } from '../api/columns'
 import {
   update as updateCard,
@@ -27,7 +29,11 @@ export class Trello extends Component {
       editedCard: {
         name: "",
         description: ''
-      }
+      },
+      colDragStatus: false,
+      colDragged: null,
+      colDragTarget: null,
+      updateColumnOrderProgress: false,
     }
     this.callStoreColumn = this.callStoreColumn.bind(this);
     this.callRetrieveColumns = this.callRetrieveColumns.bind(this);
@@ -45,10 +51,15 @@ export class Trello extends Component {
 
   // Api calls - columns
   callStoreColumn() {
-    this.setState({ newColumnTitle: "" })
-    storeColumn(this.state.newColumnTitle)
-      .then(() => { this.callRetrieveColumns(); })
+    const lastCol = this.state.columns[this.state.columns.length - 1]
+    storeColumn(this.state.newColumnTitle, lastCol.order + 1)
+      .then(() => { 
+        this.callRetrieveColumns(); 
+      })
       .catch((e) => console.log("Error", e))
+      .finally(() => {
+        this.setState({ newColumnTitle: ""})
+      })
   }
 
   callRetrieveColumns() {
@@ -146,18 +157,99 @@ export class Trello extends Component {
   // Helpers
   orderColumns(rawColumns) {
     return rawColumns.sort((a, b) => {
-      return b.order - a.order;
+      return a.order - b.order;
     });
+  }
+
+  // Column dragging
+  colDragStart(e, column) {
+    console.log("drag start", column, e)
+    if (e.target.id === 'column') {
+      this.setState({
+        colDragStatus: true,
+        colDragged: column
+      })
+    }
+  }
+
+  colDragEnter(e, column) {
+    if (this.state.colDragStatus) {
+      e.preventDefault();
+      this.setState({
+        colDragTarget: column
+      }, this.spliceColumns())
+    }
+  }
+
+  colDragOver(e) {
+    if (this.state.colDragStatus) {
+      e.preventDefault();
+    }
+  }
+
+  colDrop(e) {
+    if (this.state.colDragStatus) {
+      const columnOrder = this.state.columns.map((col, index) => {
+        let id = col.id
+        return { id, index }
+      })
+      console.log("ordering object", columnOrder)
+
+      this.setState({
+        updateColumnOrderProgress: true
+      })
+
+      saveColumnOrder(columnOrder)
+        .then((response) => {
+          this.callRetrieveColumns()
+        })
+        .catch((error) => console.log("error", error))
+        .finally(() => {
+          this.setState({
+            updateColumnOrderProgress: false
+          })
+        })
+    }
+  }
+
+  colDragEnd(e) {
+    if (e.target.id === 'column') {
+      this.setState({
+        colDragStatus: false,
+        colDragged: null,
+        colDragTarget: null
+      })
+      // and order columns again...?
+    }
+  }
+
+  spliceColumns() {
+    const targetIndex = this.state.columns.findIndex((col) => {
+      return col.id === this.state.colDragTarget?.id
+    })
+    const draggedIndex = this.state.columns.findIndex((col) => {
+      return col.id === this.state.colDragged?.id
+    })
+    this.state.columns.splice(targetIndex, 0, this.state.columns.splice(draggedIndex, 1)[0])
+
   }
 
   render() {
     const columns = this.state.columns.map((col) => <Column
       key={col.id}
       column={col}
+      colDragStatus={this.state.colDragStatus}
+      draggedCol={this.state.colDragged}
+      dragTargetCol={this.state.colDragTarget}
+      openEditCardModal={(card) => this.openEditCardModal(card)}
       onDelete={(id) => this.callDeleteColumn(id)}
       onUpdate={(id, payload) => this.callUpdateColumn(id, payload)}
-      openEditCardModal={(card) => this.openEditCardModal(card)}
       refreshColumns={() => this.callRetrieveColumns()}
+      colDragStart={(e, column) => this.colDragStart(e, column)}
+      colDragEnter={(e, column) => this.colDragEnter(e, column)}
+      colDragEnd={(e) => this.colDragEnd(e)}
+      colDragOver={(e) => this.colDragOver(e)}
+      colDrop={(e) => this.colDrop(e)}
     />
     );
 
@@ -192,7 +284,7 @@ export class Trello extends Component {
     />
 
     return (
-      <div className={this.state.editCardOverlayStatus ? 'no-scroll, pageContainer' : 'pageContainer'}>
+      <div className={this.state.editCardOverlayStatus ? 'no-scroll pageContainer' : 'pageContainer'}>
         <TopBar />
         <div className="mainContainer">
           <div className="board">

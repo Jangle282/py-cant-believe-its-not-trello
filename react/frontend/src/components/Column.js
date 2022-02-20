@@ -11,7 +11,6 @@ export class Column extends Component {
     super(props);
     this.state = {
       newColumnTitle: props.column.name,
-      showColDropZoneStyle: false,
       editTitleOpen: false,
       newCardFormOpen : false,
       newCardData : {
@@ -115,32 +114,37 @@ export class Column extends Component {
       callStoreCard={(e) => this.callStoreCard(e)}
       toggleAddCardForm={(e) => this.toggleAddCardForm(e)}
     />
-  const addCard = <div 
-  className={this.state.colDragInProgress ? 'add-card-form, pointer-none' : 'add-card-form'}
-  onClick={() => this.toggleAddCardForm()}
->Add a Card
-</div>
-    
+    const addCard = <div 
+      className={this.state.colDragInProgress ? 'add-card-form pointer-none' : 'add-card-form'}
+      onClick={() => this.toggleAddCardForm()}
+        >Add a Card
+      </div>
+
+    const showColDropZoneStyle = this.props.colDragStatus 
+      && this.props.draggedCol 
+      && this.props.draggedCol.id === this.props.column.id 
+      && this.props.dragTargetCol
+
     return (
-      <div className={this.state.showColDropZoneStyle ? 'column-drop-zone, column' : 'column'}
-          // draggable="true"
-          // @dragstart="colDragStart"
-          // @dragend="colDragEnded"
-          // @dragenter="colDragEnter"
-          // @dragover="colDragOver"
-          // @drop="colDragDrop"
+      <div className={showColDropZoneStyle ? 'column-drop-zone column' : 'column'}
+          draggable="true"
+          onDragStart={(e) => this.props.colDragStart(e, this.props.column)}
+          onDragEnter={(e) => this.props.colDragEnter(e, this.props.column)}
+          onDragEnd={(e) => this.props.colDragEnd(e)}
+          onDragOver={(e) => this.props.colDragOver(e)}
+          onDrop={(e) => this.props.colDrop(e)}
           id="column"
       >
-        { !this.state.showColDropZoneStyle && 
+        { !showColDropZoneStyle && 
         <div>
-          <div className={this.state.colDragInProgress ? 'pointer-none, column-header' : 'column-header'}>
+          <div className={this.props.colDragStatus ? 'pointer-none column-header' : 'column-header'}>
             { this.state.editTitleOpen ? editColumn : columnHeader }
             <div className="delete-button" onClick={() => this.props.onDelete(this.props.column.id)}>
               <div>X</div>
             </div>
           </div>
     
-          <div className={this.state.colDragInProgress ? 'pointer-none, cardList' : 'cardList'}>
+          <div className={this.props.colDragStatus ? 'pointer-none cardList' : 'cardList'}>
             {cards}
           </div>
           {this.state.newCardFormOpen ?  addCardForm : addCard}

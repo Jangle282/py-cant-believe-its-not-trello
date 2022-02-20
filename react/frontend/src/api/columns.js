@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export function retrieve() {
     return axios
-        .get("/api/columns/")
+        .get("api/columns/")
         .then(response => {
             return response.data
         })
@@ -45,15 +45,14 @@ export function update(id, payload) {
         });
 }
 
-// export function saveColumnOrder(context) {
-//     context.commit('SET_UPDATE_ORDER_PROGRESS', true)
-//     const data = {
-//         columns: context.state.columns
-//     }
-//     axios.post('/columns/order', data).then((response) => {
-//         context.commit('SET_UPDATE_ORDER_PROGRESS', false)
-//         context.dispatch('retrieve')
-//     }).catch((error) => {
-//         console.log("error updating column order", error)
-//     })
-// }
+export function saveColumnOrder(columnOrder) {
+    return axios
+        .put('api/columns/1/order/', columnOrder)
+        .then((response) => {
+            console.log("the respones: ", response.data);
+            return response.data 
+        })
+        .catch((error) => {
+            console.log("error updating column order", error)
+        })
+}

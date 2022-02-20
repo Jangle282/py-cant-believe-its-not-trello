@@ -35,7 +35,7 @@ export class Card extends Component {
         </div>
 
         <div
-          className={expandDragZone ? 'expand-drag-zone, drag-zone' : 'drag-zone'}
+          className={expandDragZone ? 'expand-drag-zone drag-zone' : 'drag-zone'}
         // @dragenter="cardDragEnter"
         // @dragover="cardDragOver"
         // @dragleave="cardDragLeave"

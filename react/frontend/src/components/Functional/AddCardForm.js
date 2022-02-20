@@ -1,5 +1,5 @@
 export function AddCardForm(props) {
-    return (<div className={props.colDragInProgress ? 'add-card-form, pointer-none' : 'add-card-form'}>
+    return (<div className={props.colDragInProgress ? 'add-card-form pointer-none' : 'add-card-form'}>
         <input
             value={props.name}
             placeholder='Add a card'
