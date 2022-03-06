@@ -6,7 +6,9 @@ export class Card extends Component {
     super(props);
     this.state = {
       card: props.card,
-      openEditCardOverlay: false
+      openEditCardOverlay: false,
+      draggedCard: false,
+      expandDragZone: false
     }
   }
 
@@ -14,32 +16,77 @@ export class Card extends Component {
     this.props.openEditCardModal(this.props.card)
   }
 
+  cardDragStart() {
+    this.setState({
+      draggedCard: true
+    })
+  }
+
+  cardDragEnd(e) {
+    e.preventDefault()
+    this.props.cardDragEnd(e, this.props.card)
+    this.setState({
+      draggedCard: false
+    })
+  }
+
+  cardDragEnter(e) {
+    e.preventDefault();
+
+    if (!this.state.draggedCard) {
+      this.setState({
+        expandDragZone: true,
+      })
+    }
+  }
+
+  cardDragOver(e) {
+    e.preventDefault();
+  }
+
+  cardDragLeave(e) {
+    e.preventDefault();
+
+    if (!this.state.draggedCard) {
+      this.setState({
+        expandDragZone: false,
+      })
+    }  
+  }
+
+  cardDragDrop(e) {
+    e.preventDefault();
+
+    this.setState({
+      expandDragZone: false
+    })
+
+    this.props.cardDragDrop(e, this.props.card)
+  }
+
   render() {
-    const expandDragZone = false; // dragTargetId === card.id && cardIsOverTarget
-    const draggedCard = false; // draggedCardId === this.card.id
     return (
       <div className="card-container">
         <div
           draggable="true"
-          onDragStart={(e) => this.props.cardDragStart(e, this.props.card)}
-          onDragEnter={(e) => this.props.cardDragEnter(e, this.props.card)}
-          className={draggedCard ? 'dragged-card' : 'task-card'}
+          onDragStart={() => this.cardDragStart()}
+          onDragEnd={(e) => this.cardDragEnd(e)}
+          className={this.state.draggedCard ? 'dragged-card' : 'task-card'}
           id="task-card"
           onClick={() => this.openEditCardModal()}
         >
           <p className="card-name">{this.state.card.name}</p>
-
           <div className="ellipses" onClick={() => this.openEditCardModal()}>
             <div className="dots">...</div>
           </div>
         </div>
 
         <div
-          className={expandDragZone ? 'expand-drag-zone drag-zone' : 'drag-zone'}
-        onDragenter={(e) => this.props.cardDrag(e, this.props.card)}
-        onDragover={(e) => this.props.cardDrag(e, this.props.card)}
-        onDragleave={(e) => this.props.cardDrag(e, this.props.card)}
-        onDrop={(e) => this.props.cardDrag(e, this.props.card)}
+          className={this.state.expandDragZone ? 'expand-drag-zone drag-zone' : 'drag-zone'}
+          onDragEnter={(e) => this.cardDragEnter(e)}
+          onDragLeave={(e) => this.cardDragLeave(e)}
+          onDragOver={(e) => this.cardDragOver(e)}
+          onDrop={(e) => this.cardDragDrop(e)}
         ></div>
       </div>
     )

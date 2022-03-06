@@ -33,14 +33,13 @@ export function update(card) {
         });
 }
 
-// export function storeNewCardOrder(context, payload) {
-//     let data = [];
-//     payload.forEach(colId => {
-//         data.push(context.rootState.column.columns[colId]);
-//     })
-//     axios.post('/cards/reorder', {data}).then((response) => {
-//         console.log("response", response)
-//     }).catch((error) => {
-//         console.log("error updating card order", error)
-//     })
-// }
+export function saveCardOrder(cardOrder, columnId) {
+    console.log("saving card order", cardOrder, columnId);
+    return axios
+        .put('api/cards/1/order/', ({cardOrder, columnId}))
+        .then((response) => {
+            console.log("response", response)
+        }).catch((error) => {
+            console.log("error updating card order", error)
+        })
+}

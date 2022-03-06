@@ -1,6 +1,6 @@
-import {Component} from 'react'
-import {Card} from './Card'
-import {ColumnHeader} from './Functional/ColumnHeader'
+import { Component } from 'react'
+import { Card } from './Card'
+import { ColumnHeader } from './Functional/ColumnHeader'
 import { EditColumnForm } from './Functional/EditColumnForm';
 import { AddCardForm } from './Functional/AddCardForm';
 import { store as storeCard } from '../api/cards'
@@ -12,13 +12,13 @@ export class Column extends Component {
     this.state = {
       newColumnTitle: props.column.name,
       editTitleOpen: false,
-      newCardFormOpen : false,
-      newCardData : {
-        name : 'Add a card',
-        description:'Add a description',
+      newCardFormOpen: false,
+      newCardData: {
+        name: 'Add a card',
+        description: 'Add a description',
         column: this.props.column.id,
         order: -1
-      }  
+      }
     }
     this.toggleEditTitle = this.toggleEditTitle.bind(this)
     this.keyUp = this.keyUp.bind(this)
@@ -30,7 +30,7 @@ export class Column extends Component {
       editTitleOpen: !prevState.editTitleOpen
     }));
   }
-  
+
   toggleAddCardForm() {
     this.setState(prevState => ({
       newCardFormOpen: !prevState.newCardFormOpen
@@ -41,7 +41,7 @@ export class Column extends Component {
     if (e.keyCode === 13) {
       this.toggleEditTitle()
       this.props.onUpdate(this.props.column.id, {
-        name : this.state.newColumnTitle
+        name: this.state.newColumnTitle
       })
     }
   }
@@ -49,7 +49,7 @@ export class Column extends Component {
   handleColumnTitleChange(e) {
     e.preventDefault();
     this.setState({
-      newColumnTitle : e.target.value
+      newColumnTitle: e.target.value
     })
   }
 
@@ -62,19 +62,19 @@ export class Column extends Component {
 
   callStoreCard() {
     const cardsLength = this.props.column.cards.length
-    const order = cardsLength ? this.props.column.cards[cardsLength -1].order + 1 : -1
-    let cardData = {...this.state.newCardData, order}
+    const order = cardsLength ? this.props.column.cards[cardsLength - 1].order + 1 : -1
+    let cardData = { ...this.state.newCardData, order }
     storeCard(cardData)
-    .then(() => {
-      this.props.refreshColumns()
-    })
-    .catch((e) => console.log("Error", e))
+      .then(() => {
+        this.props.refreshColumns()
+      })
+      .catch((e) => console.log("Error", e))
     this.resetNewCardData()
   }
 
   resetNewCardData() {
     this.setState({
-      newCardData : {
+      newCardData: {
         name: '',
         description: '',
         column: this.props.column.id,
@@ -84,57 +84,30 @@ export class Column extends Component {
   }
 
   handleCardTitleInput(e) {
-    const newState = {...this.state.newCardData, name: e.target.value}
+    const newState = { ...this.state.newCardData, name: e.target.value }
     this.setState({ newCardData: newState })
   }
 
-  cardDragStart(e, card) {
-    console.log("start", e, card)
-    // this.$store.dispatch('card/dragStart', this.card)
-}
+  
 
-cardDragEnter(e, card) {
-    console.log("enter", e, card)
-    // event.preventDefault()
-    // if (this.card.id !== this.draggedCardId) {
-    //     this.$store.dispatch('card/dragEnter', this.card)
-    // }
-}
-
-cardDragOver(event) {
-    console.log("over")
-    // event.preventDefault()
-}
-cardDragLeave() {
-    console.log("leave")
-    // this.$store.dispatch('card/dragLeave')
-}
-cardDragDrop() {
-    console.log("drop")
-    // this.$store.dispatch("card/dragDrop");
-}
-cardDragEnded() {
-    console.log("end")
-    // this.$store.dispatch('card/dragEnd')
-}
   render() {
     const columnHeader = <ColumnHeader
-      text={this.props.column.name} 
+      text={this.props.column.name}
       onToggle={this.toggleEditTitle}
     />
-    
+
     const editColumn = <EditColumnForm
       title={this.state.newColumnTitle}
       onChange={(e) => this.handleColumnTitleChange(e)}
       onKeyUp={(e) => this.keyUp(e)}
     />
 
-    const cards = this.props.column.cards.map((card) => <Card 
-      key={card.id} 
+    const cards = this.props.column.cards.map((card) => <Card
+      key={card.id}
       card={card}
       openEditCardModal={(card) => this.props.openEditCardModal(card)}
-      cardDragEnter={(e, card) => this.cardDragEnter(e, card)}
-      cardDragStart={(e, card) => this.cardDragStart(e, card)}
+      cardDragEnd={(e, targetCard) => this.props.cardDragEnd(e, targetCard)}
+      cardDragDrop={(e, draggedCard) => this.props.cardDragDrop(e, draggedCard)}
     />);
 
     const addCardForm = <AddCardForm
@@ -145,41 +118,41 @@ cardDragEnded() {
       callStoreCard={(e) => this.callStoreCard(e)}
       toggleAddCardForm={(e) => this.toggleAddCardForm(e)}
     />
-    const addCard = <div 
+    const addCard = <div
       className={this.state.colDragInProgress ? 'add-card-form pointer-none' : 'add-card-form'}
       onClick={() => this.toggleAddCardForm()}
-        >Add a Card
-      </div>
+    >Add a Card
+    </div>
 
-    const showColDropZoneStyle = this.props.colDragStatus 
-      && this.props.draggedCol 
-      && this.props.draggedCol.id === this.props.column.id 
+    const showColDropZoneStyle = this.props.colDragStatus
+      && this.props.draggedCol
+      && this.props.draggedCol.id === this.props.column.id
       && this.props.dragTargetCol
 
     return (
       <div className={showColDropZoneStyle ? 'column-drop-zone column' : 'column'}
-          draggable="true"
-          onDragStart={(e) => this.props.colDragStart(e, this.props.column)}
-          onDragEnter={(e) => this.props.colDragEnter(e, this.props.column)}
-          onDragEnd={(e) => this.props.colDragEnd(e)}
-          onDragOver={(e) => this.props.colDragOver(e)}
-          onDrop={(e) => this.props.colDrop(e)}
-          id="column"
+        draggable="true"
+        onDragStart={(e) => this.props.colDragStart(e, this.props.column)}
+        onDragEnter={(e) => this.props.colDragEnter(e, this.props.column)}
+        onDragEnd={(e) => this.props.colDragEnd(e)}
+        onDragOver={(e) => this.props.colDragOver(e)}
+        onDrop={(e) => this.props.colDrop(e)}
+        id="column"
       >
-        { !showColDropZoneStyle && 
-        <div>
-          <div className={this.props.colDragStatus ? 'pointer-none column-header' : 'column-header'}>
-            { this.state.editTitleOpen ? editColumn : columnHeader }
-            <div className="delete-button" onClick={() => this.props.onDelete(this.props.column.id)}>
-              <div>X</div>
+        {!showColDropZoneStyle &&
+          <div>
+            <div className={this.props.colDragStatus ? 'pointer-none column-header' : 'column-header'}>
+              {this.state.editTitleOpen ? editColumn : columnHeader}
+              <div className="delete-button" onClick={() => this.props.onDelete(this.props.column.id)}>
+                <div>X</div>
+              </div>
             </div>
+
+            <div className={this.props.colDragStatus ? 'pointer-none cardList' : 'cardList'}>
+              {cards}
+            </div>
+            {this.state.newCardFormOpen ? addCardForm : addCard}
           </div>
-    
-          <div className={this.props.colDragStatus ? 'pointer-none cardList' : 'cardList'}>
-            {cards}
-          </div>
-          {this.state.newCardFormOpen ?  addCardForm : addCard}
-        </div>
         }
       </div>
     )

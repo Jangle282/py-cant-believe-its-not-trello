@@ -14,7 +14,8 @@ import {
 } from '../api/columns'
 import {
   update as updateCard,
-  destroy as deleteCard
+  destroy as deleteCard,
+  saveCardOrder
 } from '../api/cards'
 
 export class Trello extends Component {
@@ -34,6 +35,8 @@ export class Trello extends Component {
       colDragged: null,
       colDragTarget: null,
       updateColumnOrderProgress: false,
+      targetCard: null,
+      draggedCard: null
     }
     this.callStoreColumn = this.callStoreColumn.bind(this);
     this.callRetrieveColumns = this.callRetrieveColumns.bind(this);
@@ -53,12 +56,12 @@ export class Trello extends Component {
   callStoreColumn() {
     const lastCol = this.state.columns[this.state.columns.length - 1]
     storeColumn(this.state.newColumnTitle, lastCol.order + 1)
-      .then(() => { 
-        this.callRetrieveColumns(); 
+      .then(() => {
+        this.callRetrieveColumns();
       })
       .catch((e) => console.log("Error", e))
       .finally(() => {
-        this.setState({ newColumnTitle: ""})
+        this.setState({ newColumnTitle: "" })
       })
   }
 
@@ -84,13 +87,23 @@ export class Trello extends Component {
   }
 
   // Api calls - Cards
-  callUpdateCard() {
+  callUpdateEditedCard() {
     updateCard(this.state.editedCard)
       .then((response => {
         this.callRetrieveColumns()
         this.closeEditCardModal()
       }))
       .catch((error) => { console.log("error", error) })
+  }
+
+  callUpdateDraggedCardColumn() {
+    const card = this.state.draggedCard;
+    if (card) {
+      card.column = this.state.targetCard.column
+      updateCard(card)
+        .then((() => { }))
+        .catch((error) => { console.log("error", error) })
+    }
   }
 
   callDeleteCard() {
@@ -163,8 +176,8 @@ export class Trello extends Component {
 
   // Column dragging
   colDragStart(e, column) {
-    console.log("drag start", column, e)
     if (e.target.id === 'column') {
+      console.log("col drag start", column, e)
       this.setState({
         colDragStatus: true,
         colDragged: column
@@ -183,6 +196,7 @@ export class Trello extends Component {
 
   colDragOver(e) {
     if (this.state.colDragStatus) {
+      console.log("col drag over", e)
       e.preventDefault();
     }
   }
@@ -193,7 +207,6 @@ export class Trello extends Component {
         let id = col.id
         return { id, index }
       })
-      console.log("ordering object", columnOrder)
 
       this.setState({
         updateColumnOrderProgress: true
@@ -219,7 +232,6 @@ export class Trello extends Component {
         colDragged: null,
         colDragTarget: null
       })
-      // and order columns again...?
     }
   }
 
@@ -231,7 +243,63 @@ export class Trello extends Component {
       return col.id === this.state.colDragged?.id
     })
     this.state.columns.splice(targetIndex, 0, this.state.columns.splice(draggedIndex, 1)[0])
+  }
 
+  cardDragDrop(e, targetCard) {
+    // fired by target drag zone card. 
+    this.setState({
+      targetCard: targetCard
+    })
+  }
+
+  cardDragEnd(e, draggedCard) {
+    // fired by dragged card... 
+    this.setState({
+      draggedCard: draggedCard
+    }, function () {
+      this.spliceAndUpdateCards()
+    })
+  }
+
+  spliceAndUpdateCards() {
+    if (!this.state.draggedCard || !this.state.targetCard) {
+      return
+    }
+    const draggedCardColumnIndex = this.state.columns.findIndex((col) => {
+      return col.id === this.state.draggedCard.column;
+    })
+    const draggedCardIndex = this.state.columns[draggedCardColumnIndex].cards.findIndex((card) => {
+      return card.id === this.state.draggedCard.id
+    })
+    const targetColumnIndex = this.state.columns.findIndex((col) => {
+      return col.id === this.state.targetCard.column
+    })
+    const targetCardIndex = this.state.columns[targetColumnIndex].cards.findIndex((card) => {
+      return card.id === this.state.targetCard.id
+    })
+
+    const columns = this.state.columns
+
+    columns[draggedCardColumnIndex].cards.splice(draggedCardIndex, 1);
+    columns[targetColumnIndex].cards.splice(targetCardIndex + 1, 0, this.state.draggedCard)
+
+    this.setState({
+      columns: columns
+    })
+    // this.callUpdateCardOrder(draggedCardColumnIndex, this.state.draggedCard.column)
+    this.callUpdateCardOrder(targetColumnIndex, this.state.targetCard.column)
+    this.callUpdateDraggedCardColumn()
+  }
+
+  callUpdateCardOrder(columnIndex, columnId) {
+    const cardOrder = this.state.columns[columnIndex].cards.map((card, index) => {
+      let id = card.id
+      return { id, index }
+    })
+
+    saveCardOrder(cardOrder, columnId)
+      .then((response) => { })
+      .catch((e) => { console.log("error", e) })
   }
 
   render() {
@@ -241,6 +309,7 @@ export class Trello extends Component {
       colDragStatus={this.state.colDragStatus}
       draggedCol={this.state.colDragged}
       dragTargetCol={this.state.colDragTarget}
+      cardDragTarget={this.state.cardDragTarget}
       openEditCardModal={(card) => this.openEditCardModal(card)}
       onDelete={(id) => this.callDeleteColumn(id)}
       onUpdate={(id, payload) => this.callUpdateColumn(id, payload)}
@@ -250,6 +319,8 @@ export class Trello extends Component {
       colDragEnd={(e) => this.colDragEnd(e)}
       colDragOver={(e) => this.colDragOver(e)}
       colDrop={(e) => this.colDrop(e)}
+      cardDragDrop={(e, targetCard) => this.cardDragDrop(e, targetCard)}
+      cardDragEnd={(e, draggedCard) => this.cardDragEnd(e, draggedCard)}
     />
     );
 
@@ -279,7 +350,7 @@ export class Trello extends Component {
       card={this.state.editedCard}
       closeEditCardModal={(e) => this.closeEditCardModal(e)}
       handleEditCardDescription={(e) => this.handleEditCardDescription(e)}
-      callUpdateCard={() => this.callUpdateCard()}
+      callUpdateCard={() => this.callUpdateEditedCard()}
       callDeleteCard={() => this.callDeleteCard()}
     />
 

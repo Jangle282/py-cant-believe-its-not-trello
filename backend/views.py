@@ -11,9 +11,21 @@ from .models import Card, Column
 
 # Create your views here.
 
+
 class CardView(viewsets.ModelViewSet):
     serializer_class = CardSerializer
     queryset = Card.objects.all()
+
+    @action(detail=True, methods=['PUT'])
+    def order(self, request, pk=None):
+        cards = Card.objects.filter(column=request.data['columnId'])
+        for card in cards:
+            newOrder = [item.get('index') for item in request.data['cardOrder'] if item.get('id') == card.id]
+            card.order = newOrder[0]
+            card.save(update_fields=['order'])
+ 
+        return Response(200)
+
 
 class ColumnView(viewsets.ModelViewSet):
     serializer_class = ColumnSerializer
@@ -23,8 +35,9 @@ class ColumnView(viewsets.ModelViewSet):
     def order(self, request, pk=None):
         columns = Column.objects.all()
         for col in columns:
-            newOrder = [item.get('index') for item in request.data if item.get('id')==col.id]
+            newOrder = [item.get('index')
+                        for item in request.data if item.get('id') == col.id]
             col.order = newOrder[0]
             col.save(update_fields=['order'])
-        
-        return Response("Hello world")
+
+        return Response(200)
