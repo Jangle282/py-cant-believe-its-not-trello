@@ -1,5 +1,9 @@
 .idea
 .vscode
 backend/__pycache__/*
+backend/factories/__pycache__/*
+backend/management/__pycache__/*
+backend/management/commands/__pycache__/*
+backend/migrations/__pycache__/*
 trello/__pycache__/*
 db.sqlite3

@@ -88,6 +88,35 @@ export class Column extends Component {
     this.setState({ newCardData: newState })
   }
 
+  cardDragStart(e, card) {
+    console.log("start", e, card)
+    // this.$store.dispatch('card/dragStart', this.card)
+}
+
+cardDragEnter(e, card) {
+    console.log("enter", e, card)
+    // event.preventDefault()
+    // if (this.card.id !== this.draggedCardId) {
+    //     this.$store.dispatch('card/dragEnter', this.card)
+    // }
+}
+
+cardDragOver(event) {
+    console.log("over")
+    // event.preventDefault()
+}
+cardDragLeave() {
+    console.log("leave")
+    // this.$store.dispatch('card/dragLeave')
+}
+cardDragDrop() {
+    console.log("drop")
+    // this.$store.dispatch("card/dragDrop");
+}
+cardDragEnded() {
+    console.log("end")
+    // this.$store.dispatch('card/dragEnd')
+}
   render() {
     const columnHeader = <ColumnHeader
       text={this.props.column.name} 
@@ -104,6 +133,8 @@ export class Column extends Component {
       key={card.id} 
       card={card}
       openEditCardModal={(card) => this.props.openEditCardModal(card)}
+      cardDragEnter={(e, card) => this.cardDragEnter(e, card)}
+      cardDragStart={(e, card) => this.cardDragStart(e, card)}
     />);
 
     const addCardForm = <AddCardForm

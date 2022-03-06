@@ -20,9 +20,9 @@ export class Card extends Component {
     return (
       <div className="card-container">
         <div
-          // draggable="true"
-          // @dragstart="cardDragStart"
-          // @dragend="cardDragEnded"
+          draggable="true"
+          onDragStart={(e) => this.props.cardDragStart(e, this.props.card)}
+          onDragEnter={(e) => this.props.cardDragEnter(e, this.props.card)}
           className={draggedCard ? 'dragged-card' : 'task-card'}
           id="task-card"
           onClick={() => this.openEditCardModal()}
@@ -36,10 +36,10 @@ export class Card extends Component {
 
         <div
           className={expandDragZone ? 'expand-drag-zone drag-zone' : 'drag-zone'}
-        // @dragenter="cardDragEnter"
-        // @dragover="cardDragOver"
-        // @dragleave="cardDragLeave"
-        // @drop="cardDragDrop"
+        onDragenter={(e) => this.props.cardDrag(e, this.props.card)}
+        onDragover={(e) => this.props.cardDrag(e, this.props.card)}
+        onDragleave={(e) => this.props.cardDrag(e, this.props.card)}
+        onDrop={(e) => this.props.cardDrag(e, this.props.card)}
         ></div>
       </div>
     )
